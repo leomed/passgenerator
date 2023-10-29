@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
 import random
+import pyperclip
+
+
 window = Tk()
 window.title("Password Generator")
 window.config(padx=20, pady=20)
@@ -45,8 +48,12 @@ def generate_pass():
     # password = ""
     # for char in password_list:
     #   password += char
+
     password = "".join(password_list)
-    print(f"Your password is: {password}")
+    """With insert i can see the password generated in the input"""
+    input_password.insert(0, password)
+
+    pyperclip.copy(password)
 
 
 
@@ -57,7 +64,7 @@ def save_data():
     user = input_username
     web = input_website
     passw = input_password
-
+    """Be careful to use .get!!"""
     if int(len(user.get())) == 0 or int(len(web.get())) == 0  or int(len(passw.get()) == 0):
         fill = messagebox.showerror(title="Warning", message="Please do not leave any blanks")
 
