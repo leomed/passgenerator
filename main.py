@@ -61,10 +61,13 @@ def generate_pass():
 
 
 def save_data():
+    """This variables are the inputs created below"""
     user = input_username
     web = input_website
     passw = input_password
+
     """Be careful to use .get!!"""
+    """If the user forgets to write something it pop out an error"""
     if int(len(user.get())) == 0 or int(len(web.get())) == 0  or int(len(passw.get()) == 0):
         fill = messagebox.showerror(title="Warning", message="Please do not leave any blanks")
 
@@ -74,7 +77,7 @@ def save_data():
                                        message=f" \n These are the details entered:\n User:{user.get()} ,\n Password:{passw.get()}\n")
         with open("data.text", "a") as data_file:
                 data_file.write(user.get() + "/" + web.get() + "/" + passw.get() + "\n")
-                """Delete , as it word it deletes what you wrote once you press accept"""
+                """deletes what you wrote once you press accept"""
                 web.delete(0,END)
                 passw.delete(0,END)
 
