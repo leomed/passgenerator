@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
-
+import json
 
 window = Tk()
 window.title("Password Generator")
@@ -49,11 +49,12 @@ def generate_pass():
     # for char in password_list:
     #   password += char
 
-    password = "".join(password_list)
-    """With insert i can see the password generated in the input"""
-    input_password.insert(0, password)
+    passwor = "".join(password_list)
 
-    pyperclip.copy(password)
+    """With insert i can see the password generated in the input"""
+    password.insert(0, passwor)
+
+    pyperclip.copy(passwor)
 
 
 
@@ -62,24 +63,71 @@ def generate_pass():
 
 def save_data():
     """This variables are the inputs created below"""
-    user = input_username
-    web = input_website
-    passw = input_password
+
+
+    user = username.get()
+    web = website.get()
+    passw = password.get()
+
+    new_data = {
+
+        web: {
+            "user/email": user,
+            "password": passw
+         }
+
+
+    }
 
     """Be careful to use .get!!"""
     """If the user forgets to write something it pop out an error"""
-    if int(len(user.get())) == 0 or int(len(web.get())) == 0  or int(len(passw.get()) == 0):
+    if int(len(user)) == 0 or int(len(web)) == 0 or int(len(passw) == 0):
         fill = messagebox.showerror(title="Warning", message="Please do not leave any blanks")
 
-
     else:
-        messagebox.askokcancel(title=f"{web.get()}",
-                                       message=f" \n These are the details entered:\n User:{user.get()} ,\n Password:{passw.get()}\n")
-        with open("data.text", "a") as data_file:
-                data_file.write(user.get() + "/" + web.get() + "/" + passw.get() + "\n")
-                """deletes what you wrote once you press accept"""
-                web.delete(0,END)
-                passw.delete(0,END)
+        try:
+            #Read old data
+            with open("data.json", "r") as data_file:
+                # Load is used to read the data inside the file
+                data = json.load(data_file)
+
+        except FileNotFoundError:
+            #If the file does not exist , create it
+            with open("data.json", "w") as data_file:
+                json.dump(new_data,data_file, indent=4)
+        else:
+            # Update old date with new data
+            data.update(new_data)
+
+            with open("data.json", "w") as data_file:
+                json.dump(data,data_file,indent=4)
+        finally:
+            website.delete(0, END)
+            password.delete(0, END)
+
+def search_data():
+        #It is neccessary to use get to work with the entrys
+        website_s = website.get()
+        try:
+            with open("data.json") as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+                messagebox.showinfo(title="Warning", message="This data file does not exist")
+        else:
+            #Iterating the dictionary in the json file
+            if website_s in data:
+                email = data[website_s]["user/email"]
+                password = data[website_s]["password"]
+                messagebox.showinfo(title=website_s, message=f"Email:{email} \n Password:{password}")
+            else:
+                messagebox.showinfo(title="Warning", message=f"No details for {website_s}")
+
+
+
+
+
+
+
 
 
     # top = Toplevel(window)
@@ -89,6 +137,10 @@ def save_data():
     # mess.grid(column=1, row=1)
     # but = Button(top,text="Ok" ,command=top.destroy)
     # but.grid(column=1,row=2)
+
+
+
+
 
 
 # Ui -------------------------------------------- #
@@ -113,21 +165,24 @@ row_three_label.grid(column=0,row=3)
 
 #Inputs
 
-input_website = Entry(width=50)
-input_website.grid( column=1, row=1,columnspan=2)
-input_website.focus()
+website = Entry(width=50)
+website.grid( column=1, row=1,columnspan=2)
+website.focus()
 """Focus allow to put the cursor in the entry"""
 
-input_username = Entry(width=50)
-input_username.grid( column=1, row=2,columnspan=2)
-input_username.insert(0,"leo@hotmail.com")
+username = Entry(width=50)
+username.grid( column=1, row=2,columnspan=2)
+username.insert(0,"leo@hotmail.com")
 """Insert pre-write the text in the app"""
 
-input_password = Entry(width=50)
-input_password.grid(column=1, row=3 , columnspan=2)
+password = Entry(width=50)
+password.grid(column=1, row=3 , columnspan=2)
 
 
 #Button
+
+search_btn = Button(text="Search", width=14 , command=search_data)
+search_btn.grid(column=4 ,row=1, columnspan=2)
 
 generate_btn = Button(text="Generate Password" , command=generate_pass)
 generate_btn.grid(column=4 ,row=3, columnspan=2)
